@@ -129,7 +129,7 @@ Module MainModule
         Console.WriteLine("")
 
         Dim objIniFile As New IniFile(Directory.GetCurrentDirectory() + "\SQLHC.ini")
-        'objIniFile.WriteString("Target", "Server", "192.168.1.51")
+        'objIniFile.WriteString("Target", "Server", "HOSTNAME\instancename")
         'objIniFile.WriteString("Target", "Auth", "SQL")
         'objIniFile.WriteString("Target", "User", "sa")
         'objIniFile.WriteString("Target", "Password", "password")
