@@ -25,4 +25,4 @@
 	  lower(db_name(database_id))  NOT IN (N'master', N'tempdb', N'model', N'msdb', N'pubs', N'northwind', N'adventureworks', N'adventureworksdw')
    and [is_percent_growth]=1 ) t  
 	where t.NextGrowthSize <1024
-	order by [Server Name],[Instance Name],[Database Name],[Next Growth MB],[Read Only]
+	order by [Server],[Instance],[DBname],[Next Growth MB],[Read Only]
