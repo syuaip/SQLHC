@@ -23,3 +23,5 @@ AND i.type_desc = 'nonclustered'
 AND i.is_primary_key = 0
 AND i.is_unique_constraint = 0
 ORDER BY (dm_ius.user_seeks + dm_ius.user_scans + dm_ius.user_lookups) ASC
+--- change the order to UserUpdates when needed
+--- to see how busy the table is, check scans and seeks. check also ratio of updates / (scan+seek).
