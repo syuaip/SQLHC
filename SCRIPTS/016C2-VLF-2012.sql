@@ -8,35 +8,7 @@
 --- IN ANY WAY OUT OF THE USE OF THIS SAMPLE CODE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----
 --- VLF SQL2012 onward
-Create Table #stage(
-    RecoveryUnitID int
-  , FileID      int
-  , FileSize    bigint
-  , StartOffset bigint
-  , FSeqNo      bigint
-  , [Status]    bigint
-  , Parity      bigint
-  , CreateLSN   numeric(38)
-);
- 
-Create Table #results(
-    Database_Name   sysname
-  , VLF_count       int 
-);
- 
-Exec sp_msforeachdb N'Use ?; 
-            Insert Into #stage 
-            Exec sp_executeSQL N''DBCC LogInfo(?)''; 
- 
-            Insert Into #results 
-            Select DB_Name(), Count(*) 
-            From #stage; 
- 
-            Truncate Table #stage;'
- 
-Select * 
-From #results
-Order By VLF_count Desc;
- 
-Drop Table #stage;
-Drop Table #results;
+SELECT [name], COUNT(l.database_id) AS 'vlf_count' 
+FROM sys.databases AS s
+CROSS APPLY sys.dm_db_log_info(s.database_id) AS l
+GROUP BY [name]
