@@ -3,18 +3,42 @@
 --This posting is provided "AS IS" with no warranties, and confers no rights. 
 
 --- USE DB
-SELECT S.name as 'Schema',
-T.name as 'Table',
-I.name as 'Index',
-DDIPS.avg_fragmentation_in_percent,
-DDIPS.page_count
-FROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, NULL) AS DDIPS
-INNER JOIN sys.tables T on T.object_id = DDIPS.object_id
-INNER JOIN sys.schemas S on T.schema_id = S.schema_id
-INNER JOIN sys.indexes I ON I.object_id = DDIPS.object_id
-AND DDIPS.index_id = I.index_id
-WHERE DDIPS.database_id = DB_ID()
-and I.name is not null
-AND DDIPS.avg_fragmentation_in_percent > 0
-ORDER BY DDIPS.avg_fragmentation_in_percent desc
+DECLARE @IPageCnt INT
+DECLARE @IMinFragmentation INT
+DECLARE @IsMaintenanceDay INT
+
+SET @IPageCnt = 8;
+SET @IMinFragmentation = 10;
+SET @IsMaintenanceDay = 7;
+
+SELECT
+    OBJECT_SCHEMA_NAME(FRAG.[object_id]) + '.' + OBJECT_NAME(FRAG.[object_id]) AS TableName,
+    SIX.[name] As IndexName,
+	index_type_desc, 
+    FRAG.avg_fragmentation_in_percent,
+    FRAG.page_count
+FROM
+    sys.dm_db_index_physical_stats 
+    (
+        DB_ID(),    --use the currently connected database
+        0,          --Parameter for object_id.
+        DEFAULT,    --Parameter for index_id.
+        0,          --Parameter for partition_number.
+        DEFAULT     --Scanning mode. Default to "LIMITED", which is good enough
+    ) FRAG
+    JOIN
+    sys.indexes SIX ON FRAG.[object_id] = SIX.[object_id] AND FRAG.index_id = SIX.index_id
+WHERE
+    --don't bother with heaps, if we have these anyway outside staging tables.
+    FRAG.index_type_desc <> 'HEAP' AND
+    (
+    --Either consider only those indexes that need treatment
+    (FRAG.page_count > @IPageCnt AND FRAG.avg_fragmentation_in_percent > @IMinFragmentation)
+    OR
+    --or do everything when it is MaintenanceDay
+    @IsMaintenanceDay = 1
+    )
+ORDER BY
+    FRAG.avg_fragmentation_in_percent DESC;
+
 
