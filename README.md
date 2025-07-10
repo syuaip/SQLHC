@@ -2,7 +2,7 @@
 
 ### Notes
 
-Download the binary from [rpdcli github](https://github.com/syuaip/rpdcli) release section, or from http://awssg.reksadata.net/binary/rditools.zip
+Download the binary from the release section, or from http://awssg.reksadata.net/binary/rditools.zip
 
 For these releases, binary was compiled with Delphi 7.0 Ultimate 4.453 on top of Windows XP VM.
 
